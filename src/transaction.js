@@ -43,6 +43,7 @@ class Transaction {
   constructor() {
     this.version = 1;
     this.locktime = 0;
+    this.time = Math.round(new Date().getTime() / 1000);
     this.ins = [];
     this.outs = [];
   }
@@ -433,6 +434,7 @@ class Transaction {
       vector.forEach(writeVarSlice);
     }
     writeInt32(this.version);
+    writeInt32(this.time);
     const hasWitnesses = _ALLOW_WITNESS && this.hasWitnesses();
     if (hasWitnesses) {
       writeUInt8(Transaction.ADVANCED_TRANSACTION_MARKER);

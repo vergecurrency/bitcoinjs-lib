@@ -177,6 +177,7 @@ export class Transaction {
 
   version: number = 1;
   locktime: number = 0;
+  time: number = Math.round(new Date().getTime() / 1000);
   ins: Input[] = [];
   outs: Output[] = [];
 
@@ -569,6 +570,7 @@ export class Transaction {
     }
 
     writeInt32(this.version);
+    writeInt32(this.time);
 
     const hasWitnesses = _ALLOW_WITNESS && this.hasWitnesses();
 
