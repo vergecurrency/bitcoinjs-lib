@@ -1,18 +1,18 @@
 {
-  "name": "bitcoinjs-lib",
+  "name": "vergejs-lib",
   "version": "5.1.6",
-  "description": "Client-side Bitcoin JavaScript library",
+  "description": "Client-side Verge JavaScript library",
   "main": "./src/index.js",
   "types": "./types/index.d.ts",
   "engines": {
     "node": ">=8.0.0"
   },
   "keywords": [
-    "bitcoinjs",
-    "bitcoin",
+    "vergejs",
+    "verge",
     "browserify",
     "javascript",
-    "bitcoinjs"
+    "verge-js"
   ],
   "scripts": {
     "build": "npm run clean && tsc -p ./tsconfig.json && npm run formatjs",
