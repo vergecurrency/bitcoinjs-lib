@@ -49,7 +49,7 @@ function txIsTransaction(tx) {
 class TransactionBuilder {
   // WARNING: maximumFeeRate is __NOT__ to be relied on,
   //          it's just another potential safety mechanism (safety in-depth)
-  constructor(network = networks.bitcoin, maximumFeeRate = 2500) {
+  constructor(network = networks.verge, maximumFeeRate = 2500) {
     this.network = network;
     this.maximumFeeRate = maximumFeeRate;
     this.__PREV_TX_SET = {};
