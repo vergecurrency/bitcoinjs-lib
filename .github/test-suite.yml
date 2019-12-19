@@ -1,4 +1,4 @@
-name: Full Test Suite
+name: verge-js-tests
 
 on: [push]
 
