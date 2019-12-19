@@ -2,7 +2,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 exports.bitcoin = {
   messagePrefix: '\x18Verge Signed Message:\n',
-  bech32: 'bc',
+  bech32: 'vg',
   bip32: {
     public: 0x022d2533,
     private: 0x0221312b,
@@ -12,8 +12,8 @@ exports.bitcoin = {
   wif: 0x80,
 };
 exports.regtest = {
-  messagePrefix: '\x18Bitcoin Signed Message:\n',
-  bech32: 'bcrt',
+  messagePrefix: '\x18Verge Signed Message:\n',
+  bech32: 'vgrt',
   bip32: {
     public: 0x043587cf,
     private: 0x04358394,
@@ -23,8 +23,8 @@ exports.regtest = {
   wif: 0xef,
 };
 exports.testnet = {
-  messagePrefix: '\x18Bitcoin Signed Message:\n',
-  bech32: 'tb',
+  messagePrefix: '\x18Verge Signed Message:\n',
+  bech32: 'tvg',
   bip32: {
     public: 0x043587cf,
     private: 0x04358394,
