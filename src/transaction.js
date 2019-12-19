@@ -209,6 +209,7 @@ class Transaction {
   clone() {
     const newTx = new Transaction();
     newTx.version = this.version;
+	newTx.time = this.time;
     newTx.locktime = this.locktime;
     newTx.ins = this.ins.map(txIn => {
       return {

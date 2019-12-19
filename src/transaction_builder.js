@@ -69,6 +69,7 @@ class TransactionBuilder {
     const txb = new TransactionBuilder(network);
     // Copy transaction fields
     txb.setVersion(transaction.version);
+	txb.setTime = (transaction.time);
     txb.setLockTime(transaction.locktime);
     // Copy outputs (done first to avoid signature invalidation)
     transaction.outs.forEach(txOut => {

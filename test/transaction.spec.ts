@@ -8,6 +8,7 @@ describe('Transaction', () => {
   function fromRaw(raw: any, noWitness?: boolean): Transaction {
     const tx = new Transaction();
     tx.version = raw.version;
+	tx.time = raw.time;
     tx.locktime = raw.locktime;
 
     raw.ins.forEach((txIn: any, i: number) => {
