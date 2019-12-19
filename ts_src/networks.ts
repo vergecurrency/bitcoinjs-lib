@@ -7,6 +7,8 @@ export interface Network {
   pubKeyHash: number;
   scriptHash: number;
   wif: number;
+  usesTimestamps: boolean;
+  supportsWitness: boolean;
 }
 
 interface Bip32 {
@@ -24,6 +26,8 @@ export const bitcoin: Network = {
   pubKeyHash: 0x00,
   scriptHash: 0x05,
   wif: 0x80,
+  usesTimestamps: false,
+  supportsWitness: true,
 };
 export const regtest: Network = {
   messagePrefix: '\x18Bitcoin Signed Message:\n',
@@ -35,6 +39,8 @@ export const regtest: Network = {
   pubKeyHash: 0x6f,
   scriptHash: 0xc4,
   wif: 0xef,
+  usesTimestamps: false,
+  supportsWitness: true,
 };
 export const testnet: Network = {
   messagePrefix: '\x18Bitcoin Signed Message:\n',
@@ -46,6 +52,8 @@ export const testnet: Network = {
   pubKeyHash: 0x6f,
   scriptHash: 0xc4,
   wif: 0xef,
+  usesTimestamps: false,
+  supportsWitness: true,
 };
 export const verge: Network = {
   messagePrefix: '\x18VERGE Signed Message:\n',
@@ -57,4 +65,6 @@ export const verge: Network = {
   pubKeyHash: 0x1e,
   scriptHash: 0x21,
   wif: 0x9e,
+  usesTimestamps: true,
+  supportsWitness: false,
 };
