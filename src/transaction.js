@@ -76,24 +76,27 @@ class Transaction {
     function readVarSlice() {
       return readSlice(readVarInt());
     }
-    function readVector() {
-      const count = readVarInt();
-      const vector = [];
-      for (let i = 0; i < count; i++) vector.push(readVarSlice());
-      return vector;
-    }
+    // WITNESS:
+    // function readVector(): Buffer[] {
+    //   const count = readVarInt();
+    //   const vector: Buffer[] = [];
+    //   for (let i = 0; i < count; i++) vector.push(readVarSlice());
+    //   return vector;
+    // }
     const tx = new Transaction();
     tx.version = readInt32();
-    const marker = buffer.readUInt8(offset);
-    const flag = buffer.readUInt8(offset + 1);
-    let hasWitnesses = false;
-    if (
-      marker === Transaction.ADVANCED_TRANSACTION_MARKER &&
-      flag === Transaction.ADVANCED_TRANSACTION_FLAG
-    ) {
-      offset += 2;
-      hasWitnesses = true;
-    }
+    tx.time = readInt32();
+    // WITNESS:
+    // const marker = buffer.readUInt8(offset);
+    // const flag = buffer.readUInt8(offset + 1);
+    // const hasWitnesses = false;
+    // if (
+    //   marker === Transaction.ADVANCED_TRANSACTION_MARKER &&
+    //   flag === Transaction.ADVANCED_TRANSACTION_FLAG
+    // ) {
+    //   offset += 2;
+    //   hasWitnesses = true;
+    // }
     const vinLen = readVarInt();
     for (let i = 0; i < vinLen; ++i) {
       tx.ins.push({
@@ -111,14 +114,15 @@ class Transaction {
         script: readVarSlice(),
       });
     }
-    if (hasWitnesses) {
-      for (let i = 0; i < vinLen; ++i) {
-        tx.ins[i].witness = readVector();
-      }
-      // was this pointless?
-      if (!tx.hasWitnesses())
-        throw new Error('Transaction has superfluous witness data');
-    }
+    // WITNESS:
+    // if (hasWitnesses) {
+    //   for (let i = 0; i < vinLen; ++i) {
+    //     tx.ins[i].witness = readVector();
+    //   }
+    //   // was this pointless?
+    //   if (!tx.hasWitnesses())
+    //     throw new Error('Transaction has superfluous witness data');
+    // }
     tx.locktime = readUInt32();
     if (_NO_STRICT) return tx;
     if (offset !== buffer.length)
@@ -209,7 +213,7 @@ class Transaction {
   clone() {
     const newTx = new Transaction();
     newTx.version = this.version;
-	newTx.time = this.time;
+    newTx.time = this.time;
     newTx.locktime = this.locktime;
     newTx.ins = this.ins.map(txIn => {
       return {

@@ -22,6 +22,7 @@ export declare class TransactionBuilder {
     setLowR(setting?: boolean): boolean;
     setLockTime(locktime: number): void;
     setVersion(version: number): void;
+    setTime(time: number): void;
     addInput(txHash: Buffer | string | Transaction, vout: number, sequence?: number, prevOutScript?: Buffer): number;
     addOutput(scriptPubKey: string | Buffer, value: number): number;
     build(): Transaction;

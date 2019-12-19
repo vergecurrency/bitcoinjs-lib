@@ -103,27 +103,30 @@ export class Transaction {
       return readSlice(readVarInt());
     }
 
-    function readVector(): Buffer[] {
-      const count = readVarInt();
-      const vector: Buffer[] = [];
-      for (let i = 0; i < count; i++) vector.push(readVarSlice());
-      return vector;
-    }
+    // WITNESS:
+    // function readVector(): Buffer[] {
+    //   const count = readVarInt();
+    //   const vector: Buffer[] = [];
+    //   for (let i = 0; i < count; i++) vector.push(readVarSlice());
+    //   return vector;
+    // }
 
     const tx = new Transaction();
     tx.version = readInt32();
+    tx.time = readInt32();
 
-    const marker = buffer.readUInt8(offset);
-    const flag = buffer.readUInt8(offset + 1);
+    // WITNESS:
+    // const marker = buffer.readUInt8(offset);
+    // const flag = buffer.readUInt8(offset + 1);
 
-    let hasWitnesses = false;
-    if (
-      marker === Transaction.ADVANCED_TRANSACTION_MARKER &&
-      flag === Transaction.ADVANCED_TRANSACTION_FLAG
-    ) {
-      offset += 2;
-      hasWitnesses = true;
-    }
+    // const hasWitnesses = false;
+    // if (
+    //   marker === Transaction.ADVANCED_TRANSACTION_MARKER &&
+    //   flag === Transaction.ADVANCED_TRANSACTION_FLAG
+    // ) {
+    //   offset += 2;
+    //   hasWitnesses = true;
+    // }
 
     const vinLen = readVarInt();
     for (let i = 0; i < vinLen; ++i) {
@@ -144,15 +147,16 @@ export class Transaction {
       });
     }
 
-    if (hasWitnesses) {
-      for (let i = 0; i < vinLen; ++i) {
-        tx.ins[i].witness = readVector();
-      }
+    // WITNESS:
+    // if (hasWitnesses) {
+    //   for (let i = 0; i < vinLen; ++i) {
+    //     tx.ins[i].witness = readVector();
+    //   }
 
-      // was this pointless?
-      if (!tx.hasWitnesses())
-        throw new Error('Transaction has superfluous witness data');
-    }
+    //   // was this pointless?
+    //   if (!tx.hasWitnesses())
+    //     throw new Error('Transaction has superfluous witness data');
+    // }
 
     tx.locktime = readUInt32();
 
@@ -271,6 +275,7 @@ export class Transaction {
   clone(): Transaction {
     const newTx = new Transaction();
     newTx.version = this.version;
+    newTx.time = this.time;
     newTx.locktime = this.locktime;
 
     newTx.ins = this.ins.map(txIn => {
