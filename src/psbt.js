@@ -3,6 +3,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 const bip174_1 = require('bip174');
 const varuint = require('bip174/src/lib/converter/varint');
 const utils_1 = require('bip174/src/lib/utils');
+const _1 = require('.');
 const address_1 = require('./address');
 const bufferutils_1 = require('./bufferutils');
 const crypto_1 = require('./crypto');
@@ -11,7 +12,6 @@ const networks_1 = require('./networks');
 const payments = require('./payments');
 const bscript = require('./script');
 const transaction_1 = require('./transaction');
-const _1 = require('.');
 /**
  * These are the default arguments for a Psbt instance.
  */
