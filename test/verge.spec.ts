@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { describe, it } from 'mocha';
 
-import { address, Transaction, networks, ECPair, Psbt } from '..';
+import { address, ECPair, networks, Psbt, Transaction } from '..';
 
 describe.only('Verge-Base Tests', () => {
   it('Address to OuputScript', () => {
