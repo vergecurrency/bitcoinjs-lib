@@ -13,6 +13,7 @@ import {
   TransactionInput,
 } from 'bip174/src/lib/interfaces';
 import { checkForInput } from 'bip174/src/lib/utils';
+import { networks } from '.';
 import { toOutputScript } from './address';
 import { reverseBuffer } from './bufferutils';
 import { hash160 } from './crypto';
@@ -25,7 +26,6 @@ import { bitcoin as btcNetwork, Network } from './networks';
 import * as payments from './payments';
 import * as bscript from './script';
 import { Output, Transaction } from './transaction';
-import { networks } from '.';
 
 /**
  * These are the default arguments for a Psbt instance.
