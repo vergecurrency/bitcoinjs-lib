@@ -5,6 +5,8 @@ export interface Network {
     pubKeyHash: number;
     scriptHash: number;
     wif: number;
+    usesTimestamps: boolean;
+    supportsWitness: boolean;
 }
 interface Bip32 {
     public: number;

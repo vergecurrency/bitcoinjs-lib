@@ -128,6 +128,8 @@ describe('bitcoinjs-lib (addresses)', () => {
       pubKeyHash: 0x30,
       scriptHash: 0x32,
       wif: 0xb0,
+      usesTimestamps: false,
+      supportsWitness: true,
     };
 
     const keyPair = bitcoin.ECPair.makeRandom({ network: LITECOIN });

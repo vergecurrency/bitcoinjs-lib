@@ -11,6 +11,7 @@ const networks_1 = require('./networks');
 const payments = require('./payments');
 const bscript = require('./script');
 const transaction_1 = require('./transaction');
+const _1 = require('.');
 /**
  * These are the default arguments for a Psbt instance.
  */
@@ -60,7 +61,10 @@ const DEFAULT_OPTS = {
  *   Transaction object. Such as fee rate not being larger than maximumFeeRate etc.
  */
 class Psbt {
-  constructor(opts = {}, data = new bip174_1.Psbt(new PsbtTransaction())) {
+  constructor(
+    opts = {},
+    data = new bip174_1.Psbt(new PsbtTransaction(undefined, opts.network)),
+  ) {
     this.data = data;
     // set defaults
     this.opts = Object.assign({}, DEFAULT_OPTS, opts);
@@ -162,7 +166,7 @@ class Psbt {
     const inputIndex = this.data.inputs.length - 1;
     const input = this.data.inputs[inputIndex];
     if (input.nonWitnessUtxo) {
-      addNonWitnessTxCache(this.__CACHE, input, inputIndex);
+      addNonWitnessTxCache(this.__CACHE, input, inputIndex, this.opts.network);
     }
     c.__FEE = undefined;
     c.__FEE_RATE = undefined;
@@ -501,6 +505,7 @@ class Psbt {
         this.__CACHE,
         this.data.inputs[inputIndex],
         inputIndex,
+        this.opts.network,
       );
     }
     return this;
@@ -538,8 +543,12 @@ const transactionFromBuffer = buffer => new PsbtTransaction(buffer);
  * It contains a bitcoinjs-lib Transaction object.
  */
 class PsbtTransaction {
-  constructor(buffer = Buffer.from([2, 0, 0, 0, 0, 0, 0, 0, 0, 0])) {
-    this.tx = transaction_1.Transaction.fromBuffer(buffer);
+  constructor(
+    _buffer = Buffer.from([2, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    network = _1.networks.verge,
+  ) {
+    this.network = network;
+    this.tx = new transaction_1.Transaction();
     checkTxEmpty(this.tx);
     Object.defineProperty(this, 'tx', {
       enumerable: false,
@@ -1110,9 +1119,18 @@ function witnessStackToScriptWitness(witness) {
   writeVector(witness);
   return buffer;
 }
-function addNonWitnessTxCache(cache, input, inputIndex) {
+function addNonWitnessTxCache(
+  cache,
+  input,
+  inputIndex,
+  network = _1.networks.verge,
+) {
   cache.__NON_WITNESS_UTXO_BUF_CACHE[inputIndex] = input.nonWitnessUtxo;
-  const tx = transaction_1.Transaction.fromBuffer(input.nonWitnessUtxo);
+  const tx = transaction_1.Transaction.fromBuffer(
+    input.nonWitnessUtxo,
+    undefined,
+    network,
+  );
   cache.__NON_WITNESS_UTXO_TX_CACHE[inputIndex] = tx;
   const self = cache;
   const selfIndex = inputIndex;

@@ -1,3 +1,4 @@
+import { Network } from './networks';
 export interface Output {
     script: Buffer;
     value: number;
@@ -17,8 +18,8 @@ export declare class Transaction {
     static readonly SIGHASH_ANYONECANPAY = 128;
     static readonly ADVANCED_TRANSACTION_MARKER = 0;
     static readonly ADVANCED_TRANSACTION_FLAG = 1;
-    static fromBuffer(buffer: Buffer, _NO_STRICT?: boolean): Transaction;
-    static fromHex(hex: string): Transaction;
+    static fromBuffer(buffer: Buffer, _NO_STRICT?: boolean, network?: Network): Transaction;
+    static fromHex(hex: string, network?: Network): Transaction;
     static isCoinbaseHash(buffer: Buffer): boolean;
     version: number;
     locktime: number;
@@ -31,7 +32,7 @@ export declare class Transaction {
     hasWitnesses(): boolean;
     weight(): number;
     virtualSize(): number;
-    byteLength(_ALLOW_WITNESS?: boolean): number;
+    byteLength(_ALLOW_WITNESS?: boolean, network?: Network): number;
     clone(): Transaction;
     /**
      * Hash transaction for signing a specific input.
@@ -41,7 +42,7 @@ export declare class Transaction {
      * hashType, and then hashes the result.
      * This hash can then be used to sign the provided transaction input.
      */
-    hashForSignature(inIndex: number, prevOutScript: Buffer, hashType: number): Buffer;
+    hashForSignature(inIndex: number, prevOutScript: Buffer, hashType: number, network?: Network): Buffer;
     hashForWitnessV0(inIndex: number, prevOutScript: Buffer, value: number, hashType: number): Buffer;
     getHash(forWitness?: boolean): Buffer;
     getId(): string;

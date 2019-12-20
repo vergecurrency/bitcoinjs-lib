@@ -315,6 +315,7 @@ describe('ECPair', () => {
     );
     const lowRKeyPair = ECPair.fromWIF(
       'L3nThUzbAwpUiBAjR5zCu66ybXSPMr2zZ3ikp' + 'ScpTPiYTxBynfZu',
+      NETWORKS.bitcoin,
     );
     const dataToSign = Buffer.from(
       'b6c5c548a7f6164c8aa7af5350901626ebd69f9ae' + '2c1ecf8871f5088ec204cfe',

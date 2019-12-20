@@ -25,6 +25,7 @@ import { bitcoin as btcNetwork, Network } from './networks';
 import * as payments from './payments';
 import * as bscript from './script';
 import { Output, Transaction } from './transaction';
+import { networks } from '.';
 
 /**
  * These are the default arguments for a Psbt instance.
@@ -98,7 +99,9 @@ export class Psbt {
 
   constructor(
     opts: PsbtOptsOptional = {},
-    readonly data: PsbtBase = new PsbtBase(new PsbtTransaction()),
+    readonly data: PsbtBase = new PsbtBase(
+      new PsbtTransaction(undefined, opts.network),
+    ),
   ) {
     // set defaults
     this.opts = Object.assign({}, DEFAULT_OPTS, opts);
@@ -202,7 +205,7 @@ export class Psbt {
     const inputIndex = this.data.inputs.length - 1;
     const input = this.data.inputs[inputIndex];
     if (input.nonWitnessUtxo) {
-      addNonWitnessTxCache(this.__CACHE, input, inputIndex);
+      addNonWitnessTxCache(this.__CACHE, input, inputIndex, this.opts.network);
     }
     c.__FEE = undefined;
     c.__FEE_RATE = undefined;
@@ -593,6 +596,7 @@ export class Psbt {
         this.__CACHE,
         this.data.inputs[inputIndex],
         inputIndex,
+        this.opts.network,
       );
     }
     return this;
@@ -705,8 +709,14 @@ const transactionFromBuffer: TransactionFromBuffer = (
  */
 class PsbtTransaction implements ITransaction {
   tx: Transaction;
-  constructor(buffer: Buffer = Buffer.from([2, 0, 0, 0, 0, 0, 0, 0, 0, 0])) {
-    this.tx = Transaction.fromBuffer(buffer);
+  network: Network;
+
+  constructor(
+    _buffer: Buffer = Buffer.from([2, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    network: Network = networks.verge,
+  ) {
+    this.network = network;
+    this.tx = new Transaction();
     checkTxEmpty(this.tx);
     Object.defineProperty(this, 'tx', {
       enumerable: false,
@@ -1392,10 +1402,11 @@ function addNonWitnessTxCache(
   cache: PsbtCache,
   input: PsbtInput,
   inputIndex: number,
+  network: Network = networks.verge,
 ): void {
   cache.__NON_WITNESS_UTXO_BUF_CACHE[inputIndex] = input.nonWitnessUtxo!;
 
-  const tx = Transaction.fromBuffer(input.nonWitnessUtxo!);
+  const tx = Transaction.fromBuffer(input.nonWitnessUtxo!, undefined, network);
   cache.__NON_WITNESS_UTXO_TX_CACHE[inputIndex] = tx;
 
   const self = cache;

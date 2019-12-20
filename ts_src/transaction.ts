@@ -1,6 +1,7 @@
 import * as bufferutils from './bufferutils';
 import { reverseBuffer } from './bufferutils';
 import * as bcrypto from './crypto';
+import { Network, verge as vergeNetwork } from './networks';
 import * as bscript from './script';
 import { OPS as opcodes } from './script';
 import * as types from './types';
@@ -67,7 +68,11 @@ export class Transaction {
   static readonly ADVANCED_TRANSACTION_MARKER = 0x00;
   static readonly ADVANCED_TRANSACTION_FLAG = 0x01;
 
-  static fromBuffer(buffer: Buffer, _NO_STRICT?: boolean): Transaction {
+  static fromBuffer(
+    buffer: Buffer,
+    _NO_STRICT?: boolean,
+    network: Network = vergeNetwork,
+  ): Transaction {
     let offset: number = 0;
 
     function readSlice(n: number): Buffer {
@@ -104,29 +109,33 @@ export class Transaction {
     }
 
     // WITNESS:
-    // function readVector(): Buffer[] {
-    //   const count = readVarInt();
-    //   const vector: Buffer[] = [];
-    //   for (let i = 0; i < count; i++) vector.push(readVarSlice());
-    //   return vector;
-    // }
+    function readVector(): Buffer[] {
+      const count = readVarInt();
+      const vector: Buffer[] = [];
+      for (let i = 0; i < count; i++) vector.push(readVarSlice());
+      return vector;
+    }
 
     const tx = new Transaction();
     tx.version = readInt32();
-    tx.time = readInt32();
+    if (network.usesTimestamps) {
+      tx.time = readInt32();
+    }
 
     // WITNESS:
-    // const marker = buffer.readUInt8(offset);
-    // const flag = buffer.readUInt8(offset + 1);
+    let hasWitnesses = false;
+    if (network.supportsWitness) {
+      const marker = buffer.readUInt8(offset);
+      const flag = buffer.readUInt8(offset + 1);
 
-    // const hasWitnesses = false;
-    // if (
-    //   marker === Transaction.ADVANCED_TRANSACTION_MARKER &&
-    //   flag === Transaction.ADVANCED_TRANSACTION_FLAG
-    // ) {
-    //   offset += 2;
-    //   hasWitnesses = true;
-    // }
+      if (
+        marker === Transaction.ADVANCED_TRANSACTION_MARKER &&
+        flag === Transaction.ADVANCED_TRANSACTION_FLAG
+      ) {
+        offset += 2;
+        hasWitnesses = true;
+      }
+    }
 
     const vinLen = readVarInt();
     for (let i = 0; i < vinLen; ++i) {
@@ -148,15 +157,15 @@ export class Transaction {
     }
 
     // WITNESS:
-    // if (hasWitnesses) {
-    //   for (let i = 0; i < vinLen; ++i) {
-    //     tx.ins[i].witness = readVector();
-    //   }
+    if (network.supportsWitness && hasWitnesses) {
+      for (let i = 0; i < vinLen; ++i) {
+        tx.ins[i].witness = readVector();
+      }
 
-    //   // was this pointless?
-    //   if (!tx.hasWitnesses())
-    //     throw new Error('Transaction has superfluous witness data');
-    // }
+      // was this pointless?
+      if (!tx.hasWitnesses())
+        throw new Error('Transaction has superfluous witness data');
+    }
 
     tx.locktime = readUInt32();
 
@@ -166,9 +175,8 @@ export class Transaction {
 
     return tx;
   }
-
-  static fromHex(hex: string): Transaction {
-    return Transaction.fromBuffer(Buffer.from(hex, 'hex'), false);
+  static fromHex(hex: string, network: Network = vergeNetwork): Transaction {
+    return Transaction.fromBuffer(Buffer.from(hex, 'hex'), false, network);
   }
 
   static isCoinbaseHash(buffer: Buffer): boolean {
@@ -251,11 +259,15 @@ export class Transaction {
     return Math.ceil(this.weight() / 4);
   }
 
-  byteLength(_ALLOW_WITNESS: boolean = true): number {
+  byteLength(
+    _ALLOW_WITNESS: boolean = false,
+    network: Network = vergeNetwork,
+  ): number {
     const hasWitnesses = _ALLOW_WITNESS && this.hasWitnesses();
 
     return (
       (hasWitnesses ? 10 : 8) +
+      (network.usesTimestamps ? 4 : 0) +
       varuint.encodingLength(this.ins.length) +
       varuint.encodingLength(this.outs.length) +
       this.ins.reduce((sum, input) => {
@@ -310,6 +322,7 @@ export class Transaction {
     inIndex: number,
     prevOutScript: Buffer,
     hashType: number,
+    network: Network = vergeNetwork,
   ): Buffer {
     typeforce(
       types.tuple(types.UInt32, types.Buffer, /* types.UInt8 */ types.Number),
@@ -375,7 +388,9 @@ export class Transaction {
     }
 
     // serialize and hash
-    const buffer: Buffer = Buffer.allocUnsafe(txTmp.byteLength(false) + 4);
+    const buffer: Buffer = Buffer.allocUnsafe(
+      txTmp.byteLength(false, network) + 4,
+    );
     buffer.writeInt32LE(hashType, buffer.length - 4);
     txTmp.__toBuffer(buffer, 0, false);
 
